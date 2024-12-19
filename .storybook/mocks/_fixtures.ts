@@ -399,6 +399,7 @@ export const MOCK_FLOOD_SETTINGS: FloodSettings = {
     {id: 'reannounce', visible: true},
     {id: 'setTaxonomy', visible: true},
     {id: 'move', visible: true},
+    {id: 'rename', visible: true},
     {id: 'setTrackers', visible: true},
     {id: 'torrentDetails', visible: true},
     {id: 'downloadContents', visible: true},

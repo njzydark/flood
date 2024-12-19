@@ -63,6 +63,7 @@ export type Modal =
         | 'generate-magnet'
         | 'move-torrents'
         | 'remove-torrents'
+        | 'rename-torrents'
         | 'set-taxonomy'
         | 'set-trackers'
         | 'settings';
