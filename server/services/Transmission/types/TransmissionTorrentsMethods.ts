@@ -350,6 +350,16 @@ export interface TransmissionTorrentsSetLocationArguments {
 }
 
 // Method name: "torrent-rename-path"
+export interface TransmissionTorrentsRenamePathArguments {
+  ids: TransmissionTorrentIDs;
+  // the path to the file or folder that will be renamed
+  // the file or folder's old name
+  path: string;
+  // the file or folder's new name
+  name: string;
+}
+
+// Method name: "torrent-rename-path"
 export interface TransmissionTorrentRenamePathArguments {
   // must only be 1 torrent
   ids: TransmissionTorrentIDs;

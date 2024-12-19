@@ -10,6 +10,7 @@ import type {
   CheckTorrentsOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  RenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsInitialSeedingOptions,
   SetTorrentsPriorityOptions,
@@ -94,6 +95,14 @@ abstract class ClientGatewayService extends BaseService<ClientGatewayServiceEven
    * @return - Rejects with error.
    */
   abstract moveTorrents(options: MoveTorrentsOptions): Promise<void>;
+
+  /**
+   * Rename torrents destination path.
+   *
+   * @param options - An object of options...
+   * @return - Rejects with error.
+   */
+  abstract renameTorrents(options: RenameTorrentsOptions): Promise<void>;
 
   /**
    * Reannounces torrents to trackers

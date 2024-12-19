@@ -53,6 +53,24 @@ export interface MoveTorrentsOptions {
   isCheckHash: boolean;
 }
 
+// POST /api/torrents/rename
+export interface RenameTorrentsOptions {
+  // Hashes of torrents to be moved
+  hashes: Array<TorrentProperties['hash']>;
+  /**
+   * the directory to the torrent
+   */
+  directory: string;
+  /**
+   * the file or folder's old name
+   */
+  oldName: string;
+  /**
+   * the file or folder's new name
+   */
+  newName: string;
+}
+
 // POST /api/torrents/start
 export interface StartTorrentsOptions {
   // An array of string representing hashes of torrents to be started

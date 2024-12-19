@@ -14,6 +14,7 @@ import type {
   CheckTorrentsOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  RenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsInitialSeedingOptions,
   SetTorrentsPriorityOptions,
@@ -237,6 +238,11 @@ class QBittorrentClientGatewayService extends ClientGatewayService {
     return this.clientRequestManager
       .torrentsSetLocation(hashes, destination)
       .then(this.processClientRequestSuccess, this.processClientRequestError);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async renameTorrents({hashes, oldName, newName}: RenameTorrentsOptions): Promise<void> {
+    return Promise.reject('not supported');
   }
 
   async reannounceTorrents({hashes}: ReannounceTorrentsOptions): Promise<void> {

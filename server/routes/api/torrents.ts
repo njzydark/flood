@@ -14,6 +14,7 @@ import type {
   CreateTorrentOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  RenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsInitialSeedingOptions,
   SetTorrentsPriorityOptions,
@@ -690,6 +691,39 @@ const torrentsRoutes = async (fastify: FastifyInstance) => {
       );
     },
   );
+
+  /**
+   * POST /api/torrents/rename
+   * @summary Rename torrent destination path.
+   * @tags Torrents
+   * @security User
+   * @param {RenameTorrentsOptions} request.body.required - options - application/json
+   * @return {object} 200 - success response - application/json
+   * @return {Error} 500 - failure response - application/json
+   */
+  fastify.post<{Body: RenameTorrentsOptions}>('/rename', async (req, reply): Promise<Response> => {
+    const request = req as FloodRequest<{Body: RenameTorrentsOptions}>;
+    let sanitizedPath: string | null = null;
+    try {
+      sanitizedPath = sanitizePath(path.join(req.body.directory, req.body.oldName));
+      if (!isAllowedPath(sanitizedPath)) {
+        const {code, message} = accessDeniedError();
+        return reply.status(403).send({code, message});
+      }
+    } catch ({code, message}) {
+      return reply.status(403).send({code, message});
+    }
+
+    return request.services.clientGatewayService
+      .renameTorrents({...req.body, directory: sanitizePath(req.body.directory)})
+      .then(
+        (response) => {
+          request.services.torrentService.fetchTorrentList();
+          return reply.status(200).send(response);
+        },
+        ({code, message}) => reply.status(500).send({code, message}),
+      );
+  });
 
   /**
    *
