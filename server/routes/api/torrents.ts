@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import {normalizeTorrentUrl} from '@server/util/torrentUrlUtil';
 import type {ContentToken} from '@shared/schema/api/torrents';
-import {CreateTorrentOptionsSchema} from '@shared/types/api/torrents';
+import {CreateTorrentOptionsSchema, RenameTorrentsOptionsSchema} from '@shared/types/api/torrents';
 import contentDisposition from 'content-disposition';
 import type {CreateTorrentOptions, TorrentInput} from 'create-torrent';
 import type {FastifyInstance} from 'fastify';
@@ -1033,6 +1033,48 @@ const torrentsRoutes = async (fastify: FastifyInstance) => {
     async (request) => {
       const authedContext = getAuthedContext(request);
       return authedContext.services.clientGatewayService.getTorrentTrackers(request.params.hash);
+    },
+  );
+
+  typedFastify.post(
+    '/rename',
+    {
+      schema: {
+        summary: 'Rename torrent destination path',
+        tags: ['Torrents'],
+        security: [{User: []}],
+        body: RenameTorrentsOptionsSchema,
+        response: {
+          200: z.unknown(),
+          403: errorResponseSchema,
+          500: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const authedContext = getAuthedContext(request);
+      const {directory, hashes, newName, oldName} = request.body;
+
+      let sanitizedPath: string | null = null;
+      try {
+        sanitizedPath = sanitizePath(path.join(directory, oldName));
+        if (!isAllowedPath(sanitizedPath)) {
+          const {code, message} = accessDeniedError();
+          return reply.status(403).send({code, message});
+        }
+      } catch ({code, message}) {
+        return reply.status(403).send({code, message});
+      }
+
+      return authedContext.services.clientGatewayService
+        .renameTorrents({oldName, newName, hashes, directory: sanitizePath(directory)})
+        .then(
+          (response) => {
+            authedContext.services.torrentService.fetchTorrentList();
+            return reply.status(200).send(response);
+          },
+          ({code, message}) => reply.status(500).send({code, message}),
+        );
     },
   );
 };

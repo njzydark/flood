@@ -12,6 +12,7 @@ import type {
   CheckTorrentsOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  IRenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsPriorityOptions,
   SetTorrentsTrackersOptions,
@@ -230,6 +231,12 @@ class TransmissionClientGatewayService extends ClientGatewayService {
   async moveTorrents({hashes, destination, moveFiles}: MoveTorrentsOptions): Promise<void> {
     return this.clientRequestManager
       .setTorrentsLocation(hashes, destination, moveFiles)
+      .then(this.processClientRequestSuccess, this.processClientRequestError);
+  }
+
+  async renameTorrents({hashes, oldName, newName}: IRenameTorrentsOptions): Promise<void> {
+    return this.clientRequestManager
+      .renameTorrentsPath(hashes, oldName, newName)
       .then(this.processClientRequestSuccess, this.processClientRequestError);
   }
 

@@ -57,6 +57,20 @@ export interface MoveTorrentsOptions {
   isCheckHash: boolean;
 }
 
+// POST /api/torrents/rename
+export const RenameTorrentsOptionsSchema = z.object({
+  // Hashes of torrents to be moved
+  hashes: z.array(z.string()),
+  // the directory to the torrent
+  directory: z.string(),
+  // the file or folder's old name
+  oldName: z.string(),
+  // the file or folder's new name
+  newName: z.string(),
+});
+
+export type IRenameTorrentsOptions = z.infer<typeof RenameTorrentsOptionsSchema>;
+
 // POST /api/torrents/start
 export interface StartTorrentsOptions {
   // An array of string representing hashes of torrents to be started

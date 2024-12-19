@@ -13,6 +13,7 @@ import type {
   CheckTorrentsOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  IRenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsInitialSeedingOptions,
   SetTorrentsPriorityOptions,
@@ -398,6 +399,11 @@ class RTorrentClientGatewayService extends ClientGatewayService {
     }
 
     return this.startTorrents({hashes: hashesToRestart});
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async renameTorrents({hashes, oldName, newName}: IRenameTorrentsOptions): Promise<void> {
+    return Promise.reject('not supported');
   }
 
   async reannounceTorrents({hashes}: ReannounceTorrentsOptions): Promise<void> {
