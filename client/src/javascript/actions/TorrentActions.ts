@@ -16,6 +16,7 @@ import {
   CreateTorrentOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  RenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsInitialSeedingOptions,
   SetTorrentsPriorityOptions,
@@ -168,6 +169,20 @@ const TorrentActions = {
           id: 'alert.torrent.move.failed',
           type: 'error',
           count: options.hashes.length,
+        }),
+    ),
+
+  renameTorrents: (options: RenameTorrentsOptions): Promise<void> =>
+    axios.post(`${baseURI}api/torrents/rename`, options).then(
+      () =>
+        AlertStore.add({
+          id: 'alert.torrent.rename',
+          type: 'success',
+        }),
+      () =>
+        AlertStore.add({
+          id: 'alert.torrent.name.failed',
+          type: 'error',
         }),
     ),
 
