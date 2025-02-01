@@ -5,10 +5,10 @@ import {TransmissionTorrentError, TransmissionTorrentStatus} from '../types/Tran
 const getTorrentStatus = (
   properties: Pick<
     TransmissionTorrentProperties,
-    'error' | 'status' | 'rateDownload' | 'rateUpload' | 'haveValid' | 'totalSize'
+    'error' | 'status' | 'rateDownload' | 'rateUpload' | 'haveValid' | 'totalSize' | 'errorString'
   >,
 ): TorrentProperties['status'] => {
-  const {error, status, rateDownload, rateUpload, haveValid, totalSize} = properties;
+  const {error, status, rateDownload, rateUpload, haveValid, totalSize, errorString = ''} = properties;
   const statuses: TorrentProperties['status'] = [];
 
   switch (status) {
@@ -41,7 +41,7 @@ const getTorrentStatus = (
       break;
   }
 
-  if (error !== TransmissionTorrentError.TR_STAT_OK) {
+  if (error !== TransmissionTorrentError.TR_STAT_OK && !errorString.includes('ok')) {
     statuses.push('error');
   }
 
