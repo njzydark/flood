@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import {FC, MouseEvent, ReactNode} from 'react';
+import {FC, MouseEvent, ReactNode, TouchEvent} from 'react';
 
 export interface OverlayProps {
   children?: ReactNode;
@@ -7,6 +7,7 @@ export interface OverlayProps {
   isInteractive?: boolean;
   isTransparent?: boolean;
   onClick?: (event: MouseEvent<HTMLDivElement>) => void;
+  onTouchStart?: (event: TouchEvent) => void;
   onContextMenu?: (event: MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -14,6 +15,7 @@ const Overlay: FC<OverlayProps> = ({
   children,
   additionalClassNames,
   onClick,
+  onTouchStart,
   onContextMenu,
   isInteractive = true,
   isTransparent = false,
@@ -24,7 +26,12 @@ const Overlay: FC<OverlayProps> = ({
   });
 
   return (
-    <div className={classes} onClickCapture={onClick} onContextMenuCapture={onContextMenu}>
+    <div
+      className={classes}
+      onClickCapture={onClick}
+      onTouchStartCapture={onTouchStart}
+      onContextMenuCapture={onContextMenu}
+    >
       {children}
     </div>
   );
