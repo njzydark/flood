@@ -6,6 +6,22 @@
 [![Crowdin](https://badges.crowdin.net/flood/localized.svg)](https://crowdin.com/project/flood)
 [![Discord server badge](https://img.shields.io/discord/418267176873623553.svg?style=flat-square)](https://discord.gg/Z7yR5Uf)
 
+---
+
+> This is only self use version
+>
+> [full change](https://github.com/jesec/flood/compare/master...njzydark:flood:feat-self-use)
+>
+> [docker](https://hub.docker.com/r/njzy/flood)
+
+- feat: support rename torrent (only transmission)
+- feat: ios pwa status bar color match action bar
+- fix: contextMenu dismiss not by expect when emit by touch
+
+![IMG_0027](https://github.com/user-attachments/assets/aa23428b-ea8e-4a74-8daa-78e1a37e46ca)
+
+---
+
 Flood is a monitoring service for various torrent clients. It's a Node.js service that communicates with your favorite torrent client and serves a decent web UI for administration. [Flood-UI](https://github.com/Flood-UI) organization hosts related projects.
 
 #### Supported Clients
