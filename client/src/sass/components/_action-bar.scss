@@ -23,7 +23,16 @@ $torrent-list--border: rgba(colors.$sidebar--background, 0.15);
   }
 
   &--is-condensed {
-    height: 30px;
+    height: 40px;
+    align-items: center;
+
+    & > .actions {
+      height: 100%;
+
+      .action {
+        height: 100%;
+      }
+    }
   }
 
   &__item {
@@ -137,9 +146,6 @@ $torrent-list--border: rgba(colors.$sidebar--background, 0.15);
   }
 
   .action-bar--is-condensed & {
-    height: 30px;
-    width: 46px;
-
     .icon {
       height: 18px;
       width: 18px;

@@ -19,7 +19,7 @@ process.on('unhandledRejection', (err) => {
 });
 
 const {proxy: floodServerProxy} = yargs(process.argv.slice(2)).env('FLOOD_OPTION_').option('proxy', {
-  default: 'http://127.0.0.1:3000',
+  default: 'https://localhost:3000',
   type: 'string',
 }).argv;
 
@@ -41,7 +41,7 @@ choosePort(HOST, DEFAULT_PORT)
     const compiler = webpack(config);
     const devServer = new WebpackDevServer(
       {
-        allowedHosts: urls.lanUrlForConfig,
+        allowedHosts: 'all',
         compress: false,
         static: [
           {
