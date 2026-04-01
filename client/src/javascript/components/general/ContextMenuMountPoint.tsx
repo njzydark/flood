@@ -15,6 +15,7 @@ interface ContextMenuMountPointProps {
 
 const ContextMenuMountPoint: FC<ContextMenuMountPointProps> = observer(({id}: ContextMenuMountPointProps) => {
   const isOpen = UIStore.activeContextMenu?.id === id;
+  const isEmitByTouch = UIStore.activeContextMenu?.isEmitByTouch;
   const items = UIStore.activeContextMenu?.items ?? [];
   const triggerCoordinates = UIStore.activeContextMenu?.clickPosition ?? {
     x: 0,
@@ -28,7 +29,10 @@ const ContextMenuMountPoint: FC<ContextMenuMountPointProps> = observer(({id}: Co
   return (
     <ContextMenu
       triggerCoordinates={triggerCoordinates}
-      onOverlayClick={() => {
+      onOverlayClick={(event) => {
+        if (isEmitByTouch && !(event as unknown as TouchEvent)?.touches?.length) {
+          return;
+        }
         UIStore.dismissContextMenu(id);
       }}
       onOverlayRightClick={(e) => {

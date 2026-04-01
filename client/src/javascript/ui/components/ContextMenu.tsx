@@ -1,6 +1,6 @@
 import CSSTransition from 'react-transition-group/CSSTransition';
 import classnames from 'classnames';
-import {CSSProperties, forwardRef, MouseEvent, ReactNode, RefObject} from 'react';
+import {CSSProperties, forwardRef, MouseEvent, ReactNode, RefObject, TouchEvent} from 'react';
 
 import Overlay from './Overlay';
 
@@ -23,7 +23,7 @@ interface ContextMenuProps {
   scrolling?: boolean;
   overlayProps?: OverlayProps;
   onClick?: (event: MouseEvent<HTMLDivElement>) => void;
-  onOverlayClick?: (event: MouseEvent<HTMLDivElement>) => void;
+  onOverlayClick?: (event: MouseEvent<HTMLDivElement> | TouchEvent) => void;
   onOverlayRightClick?: (event: MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -128,6 +128,7 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
           <Overlay
             additionalClassNames="context-menu__overlay"
             onClick={onOverlayClick}
+            onTouchStart={onOverlayClick}
             onContextMenu={onOverlayRightClick}
             isTransparent
             {...overlayProps}
