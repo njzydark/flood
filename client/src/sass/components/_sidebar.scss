@@ -153,6 +153,24 @@
     display: flex;
     padding: math.div(variables.$spacing-unit * 1, 5);
     justify-content: flex-start;
+
+    &:first-child {
+      height: 60px;
+      padding-top: 0;
+      padding-bottom: 0;
+      align-items: center;
+      @include themes.theme('background', 'action-bar--background');
+
+      @media (max-width: 515px) {
+        height: 45px;
+      }
+    }
+
+    &--is-condensed {
+      &:first-child {
+        height: 40px;
+      }
+    }
   }
 
   &__diskusage {

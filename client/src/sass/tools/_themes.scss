@@ -26,6 +26,7 @@
 
 $themes: (
   light: (
+    action-bar--background: colors.$light-blue,
     action--foreground: #8899a8,
     action--foreground--hover: colors.$action--foreground--hover,
     action--background--hover: colors.$action--background--hover,
@@ -137,6 +138,7 @@ $themes: (
     sidebar-filter--count--background--active: colors.$blue,
   ),
   dark: (
+    action-bar--background: colors-dark.$md-surface-dark-e08,
     action--foreground: colors-dark.$md-grey-500,
     action--foreground--hover: colors.$action--foreground--hover,
     action--background--hover: color.adjust(colors-dark.$md-surface-dark-e08, $lightness: 4%),
