@@ -25,6 +25,7 @@ export interface ActiveContextMenu {
     y: number;
   };
   items: Array<ContextMenuItem>;
+  isEmitByTouch?: boolean;
 }
 
 export interface Dependency {
