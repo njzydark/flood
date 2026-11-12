@@ -5,6 +5,7 @@ import {observer} from 'mobx-react-lite';
 import {useMedia} from 'react-use';
 
 import AppWrapper from './components/AppWrapper';
+import BrowserTheme from './components/general/BrowserTheme';
 import LoadingOverlay from './components/general/LoadingOverlay';
 import AsyncIntlProvider from './i18n/languages';
 import ConfigStore from './stores/ConfigStore';
@@ -60,13 +61,6 @@ const FloodApp: FC = observer(() => {
   }, [isSystemPreferDark]);
 
   const isPreferDark = ConfigStore.isPreferDark;
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isPreferDark);
-    document.body.classList.toggle('dark', isPreferDark);
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', getComputedStyle(document.documentElement).backgroundColor);
-  }, [isPreferDark]);
 
   // max-width here must sync with CSS
   const isSmallScreen = useMedia('(max-width: 720px)');
@@ -75,19 +69,22 @@ const FloodApp: FC = observer(() => {
   }, [isSmallScreen]);
 
   return (
-    <Suspense fallback={<LoadingOverlay />}>
-      <AsyncIntlProvider>
-        <BrowserRouter basename={stringUtil.withoutTrailingSlash(ConfigStore.baseURI)}>
-          <AppWrapper className={isPreferDark ? 'dark' : undefined}>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/overview" element={<Overview />} />
-              <Route path="/register" element={<Register />} />
-            </Routes>
-          </AppWrapper>
-        </BrowserRouter>
-      </AsyncIntlProvider>
-    </Suspense>
+    <>
+      <BrowserTheme isDark={isPreferDark} />
+      <Suspense fallback={<LoadingOverlay />}>
+        <AsyncIntlProvider>
+          <BrowserRouter basename={stringUtil.withoutTrailingSlash(ConfigStore.baseURI)}>
+            <AppWrapper className={isPreferDark ? 'dark' : undefined}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/overview" element={<Overview />} />
+                <Route path="/register" element={<Register />} />
+              </Routes>
+            </AppWrapper>
+          </BrowserRouter>
+        </AsyncIntlProvider>
+      </Suspense>
+    </>
   );
 });
 
