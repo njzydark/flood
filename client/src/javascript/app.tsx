@@ -59,6 +59,15 @@ const FloodApp: FC = observer(() => {
     ConfigStore.setSystemPreferDark(isSystemPreferDark);
   }, [isSystemPreferDark]);
 
+  const isPreferDark = ConfigStore.isPreferDark;
+  useEffect(() => {
+    if (isPreferDark) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [isPreferDark]);
+
   // max-width here must sync with CSS
   const isSmallScreen = useMedia('(max-width: 720px)');
   useEffect(() => {
@@ -69,7 +78,7 @@ const FloodApp: FC = observer(() => {
     <Suspense fallback={<LoadingOverlay />}>
       <AsyncIntlProvider>
         <BrowserRouter basename={stringUtil.withoutTrailingSlash(ConfigStore.baseURI)}>
-          <AppWrapper className={ConfigStore.isPreferDark ? 'dark' : undefined}>
+          <AppWrapper className={isPreferDark ? 'dark' : undefined}>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/overview" element={<Overview />} />

@@ -1,7 +1,12 @@
 @use '../tools/colors';
+@use '../tools/colors-dark';
+@use '../tools/themes';
 
 body {
-  background: colors.$background;
+  background-color: colors.$light-blue;
+  &.dark {
+    background-color: colors-dark.$md-surface-dark-e08;
+  }
 }
 
 ul {

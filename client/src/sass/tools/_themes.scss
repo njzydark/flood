@@ -35,7 +35,7 @@ $themes: (
     ),
     auth-form--background: colors.$light-blue,
     loading--background: colors.$light-blue,
-    torrent-view--background: #e9eef2,
+    torrent-view--background: colors.$light-blue,
     torrent-list--background: #fff,
     torrent-list--border: -1px 0 0 0 rgba(colors.$sidebar--background, 0.15),
     torrents-list--alert--foreground: rgba(#8899a8, 0.5),
