@@ -13,8 +13,12 @@ body {
 
 // iOS Safari 26+ blurs the top edge of the page unless a fixed box spans the viewport there.
 #app {
-  inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
-    env(safe-area-inset-left, 0px);
+  background-color: inherit;
+  box-sizing: border-box;
+  inset: 0;
+  // Keep the fixed box at the viewport edges; inset content below the status bar.
+  // Let the list background extend behind the home indicator instead of leaving a footer gap.
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
   position: fixed;
 }
 
