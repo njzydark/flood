@@ -45,6 +45,7 @@ const displayContextMenu = (hash: string, event: KeyboardEvent | MouseEvent | To
 
       return torrentContextMenuActions.some((action) => action.id === item.action && action.visible === true);
     }),
+    isEmitByTouch: !!(event as unknown as TouchEvent)?.touches?.length,
   });
 };
 
