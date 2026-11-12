@@ -6,6 +6,56 @@
 [![Crowdin](https://badges.crowdin.net/flood/localized.svg)](https://crowdin.com/project/flood)
 [![Discord server badge](https://img.shields.io/discord/418267176873623553.svg?style=flat-square)](https://discord.gg/Z7yR5Uf)
 
+---
+
+> This is only self use version
+>
+> [full change](https://github.com/jesec/flood/compare/master...njzydark:flood:feat-self-use)
+>
+> [docker](https://hub.docker.com/r/njzy/flood)
+
+- feat: support rename torrent (only transmission)
+- feat: ios pwa status bar color match action bar
+- fix: contextMenu dismiss not by expect when emit by touch
+- feat: fixed sidebar actions and transfer statistics while scrolling filters
+- feat: aligned sidebar and torrent action bars, with adjusted torrent row spacing
+
+`feat-self-use` is the linear integration and build branch. Each feature branch
+below starts directly from `jesec/flood`'s `master` and contains a single focused
+commit, so it can be proposed upstream independently.
+
+| Branch                            | Scope                                                                             |
+| --------------------------------- | --------------------------------------------------------------------------------- |
+| `feat-rename-torrent`             | Transmission file and directory renaming, API validation, UI and regression tests |
+| `fix-transmission-tracker-status` | Ignore exact tracker `ok` responses while keeping upstream warning statuses       |
+| `fix-touch-context-menu`          | Keep touch context menus open after the triggering touch is released              |
+| `feat-ios-pwa-colors`             | Match the iOS PWA status bar and page background to the app theme                 |
+| `feat-sidebar-filter-scroll`      | Keep sidebar controls and transfer statistics fixed while filters scroll          |
+| `feat-action-bar-alignment`       | Align the sidebar and torrent list action bar heights and colors                  |
+| `feat-torrent-list-spacing`       | Adjust torrent row spacing and status icon contrast                               |
+
+Open upstream PRs from the corresponding feature branch. Rebase feature branches
+on the latest `upstream/master`, then replay them into `feat-self-use`. Keep the
+Flood-only Docker build, local Vite development options, this fork documentation,
+and the existing Chinese rename translations on the integration branch.
+
+The self-use features are kept on top of upstream Flood 4.16.4. Transmission tracker
+warnings use upstream's warning status; an exact `ok` tracker response is ignored.
+
+Frontend development now uses Vite. To use the previous local HTTPS backend or a
+custom development hostname, configure the proxy and allowed hosts explicitly:
+
+```bash
+FLOOD_OPTION_PROXY=https://localhost:3000 DEV_SERVER_ALLOWED_HOSTS=flood.local pnpm run start:development:client
+```
+
+`DEV_SERVER_HOST` and `DEV_SERVER_PORT` configure the frontend bind address and port.
+The development Dockerfile builds the Flood-only image without bundling rTorrent.
+
+![IMG_0027](https://github.com/user-attachments/assets/aa23428b-ea8e-4a74-8daa-78e1a37e46ca)
+
+---
+
 Flood is a monitoring service for various torrent clients. It's a Node.js service that communicates with your favorite torrent client and serves a decent web UI for administration. [Flood-UI](https://github.com/Flood-UI) organization hosts related projects.
 
 #### Supported Clients

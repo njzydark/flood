@@ -23,11 +23,12 @@ export default defineConfig({
   },
   plugins: [react(), lingui()],
   server: {
-    port: 4200,
-    host: '0.0.0.0',
+    port: Number(process.env.DEV_SERVER_PORT ?? 4200),
+    host: process.env.DEV_SERVER_HOST ?? '0.0.0.0',
+    allowedHosts: process.env.DEV_SERVER_ALLOWED_HOSTS?.split(','),
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3000',
+        target: process.env.FLOOD_OPTION_PROXY ?? 'http://127.0.0.1:3000',
         changeOrigin: true,
         secure: false,
       },
