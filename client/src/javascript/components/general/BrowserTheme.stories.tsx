@@ -29,12 +29,24 @@ export const SwitchingThemes: Story = {
   render: () => {
     const Example = () => {
       const [isDark, setIsDark] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
       return (
         <>
+          {isLoading && (
+            <div
+              data-testid="loading-background"
+              style={{backgroundColor: '#1d2938', position: 'fixed', inset: 0, zIndex: 1000, pointerEvents: 'none'}}
+            />
+          )}
           <BrowserTheme isDark={isDark} />
-          <button type="button" onClick={() => setIsDark((value) => !value)}>
-            Switch theme
-          </button>
+          <div style={{position: 'relative', zIndex: 1002, marginTop: 30}}>
+            <button type="button" onClick={() => setIsDark((value) => !value)}>
+              Switch theme
+            </button>
+            <button type="button" onClick={() => setIsLoading(false)}>
+              Finish loading
+            </button>
+          </div>
         </>
       );
     };
@@ -43,20 +55,26 @@ export const SwitchingThemes: Story = {
   play: async ({canvasElement}) => {
     const button = within(canvasElement).getByRole('button', {name: 'Switch theme'});
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    let previousEdge = canvasElement.querySelector('.application__theme-color');
+    const edge = canvasElement.querySelector('.application__theme-color') as HTMLElement;
 
     for (const isDark of [true, false, true]) {
       await userEvent.click(button);
       expect(document.documentElement.classList.contains('dark')).toBe(isDark);
       expect(document.body.classList.contains('dark')).toBe(isDark);
       expect(themeColor).toHaveAttribute('content', isDark ? 'rgb(45, 45, 45)' : 'rgb(233, 238, 242)');
-      const edge = canvasElement.querySelector('.application__theme-color') as HTMLElement;
-      // Reusing this node lets WebKit retain its previously sampled color.
-      expect(previousEdge?.isConnected).toBe(false);
-      expect(edge).not.toBe(previousEdge);
       expect(getComputedStyle(edge).pointerEvents).toBe('none');
-      expect(getComputedStyle(edge).backgroundColor).toBe('rgba(0, 0, 0, 0)');
-      previousEdge = edge;
+      // Use the toolbar palette even before the navy loading page disappears.
+      expect(getComputedStyle(edge).backgroundColor).toBe(isDark ? 'rgb(45, 45, 45)' : 'rgb(233, 238, 242)');
+      const bounds = edge.getBoundingClientRect();
+      expect(bounds.width).toBe(window.innerWidth);
+      expect(bounds.height).toBeGreaterThan(10);
+      expect(bounds.top).toBe(-6);
+      expect(bounds.bottom).toBe(6);
+      if (within(canvasElement).queryByTestId('loading-background')) {
+        await userEvent.click(within(canvasElement).getByRole('button', {name: 'Finish loading'}));
+        expect(within(canvasElement).queryByTestId('loading-background')).not.toBeInTheDocument();
+        expect(getComputedStyle(edge).backgroundColor).toBe('rgb(45, 45, 45)');
+      }
     }
   },
 };

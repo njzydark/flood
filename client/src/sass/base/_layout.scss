@@ -1,4 +1,5 @@
 @use '../tools/variables';
+@use '../tools/themes';
 
 html,
 body {
@@ -27,19 +28,18 @@ body {
 
 .application {
   &__theme-color {
-    // Safari samples 4–6px inside the top edge. A short box avoids its
-    // full-viewport color cache; an empty child keeps the transparent box eligible.
+    // Give WebKit the toolbar color directly: pixel sampling can retain the
+    // loading overlay's color. Its box must exceed 10px for direct color sampling.
+    @include themes.theme('background-color', 'torrent-view--background');
     height: 12px;
     left: 0;
     pointer-events: none;
     position: fixed;
     right: 0;
-    top: 0;
+    // Only 6px need to be visible to reach Safari's 4–6px sampling strip.
+    // Keep the rest above the viewport, clear of toolbar icons.
+    top: -6px;
     z-index: 1001;
-
-    &::after {
-      content: '';
-    }
   }
 
   &,
