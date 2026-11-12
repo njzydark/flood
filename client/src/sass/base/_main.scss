@@ -2,6 +2,7 @@
 @use '../tools/colors-dark';
 @use '../tools/themes';
 
+html,
 body {
   background-color: colors.$light-blue;
   &.dark {

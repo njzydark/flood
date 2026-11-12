@@ -61,11 +61,11 @@ const FloodApp: FC = observer(() => {
 
   const isPreferDark = ConfigStore.isPreferDark;
   useEffect(() => {
-    if (isPreferDark) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', isPreferDark);
+    document.body.classList.toggle('dark', isPreferDark);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', getComputedStyle(document.documentElement).backgroundColor);
   }, [isPreferDark]);
 
   // max-width here must sync with CSS

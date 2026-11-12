@@ -13,11 +13,11 @@ body {
 
 // iOS Safari 26+ blurs the top edge of the page unless a fixed box spans the viewport there.
 #app {
-  inset: 0;
+  inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
+    env(safe-area-inset-left, 0px);
   position: fixed;
 }
 
-#app,
 .application,
 .application__view {
   height: 100%;
