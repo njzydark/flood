@@ -10,6 +10,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#e9eef2" />
+    <script>
+      // Set the theme before the first paint, when Safari samples its edge color.
+      let preference = null;
+      try {
+        preference = localStorage.getItem('userPreferDark');
+      } catch {
+        // Use the system theme when storage is unavailable.
+      }
+      document.documentElement.classList.toggle(
+        'dark',
+        preference === 'true' || (preference !== 'false' && matchMedia('(prefers-color-scheme: dark)').matches),
+      );
+    </script>
     <link rel="manifest" href="manifest.json" />
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="icon_maskable_180x180.png" />

@@ -26,7 +26,7 @@ class ConfigStore {
 
   isSmallScreen = false;
 
-  isSystemPreferDark = false;
+  isSystemPreferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   isUserPreferDark: boolean | null = queryUserPreferDark();
   get isPreferDark(): boolean {
     return this.isUserPreferDark ?? this.isSystemPreferDark;

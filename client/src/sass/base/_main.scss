@@ -2,12 +2,17 @@
 @use '../tools/colors-dark';
 @use '../tools/themes';
 
-html,
-body {
+html {
   background-color: colors.$light-blue;
+  color-scheme: light;
   &.dark {
     background-color: colors-dark.$md-surface-dark-e08;
+    color-scheme: dark;
   }
+}
+
+body {
+  background-color: inherit;
 }
 
 ul {
