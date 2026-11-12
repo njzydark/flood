@@ -11,6 +11,7 @@ import {
   TransmissionTorrentAddArguments,
   TransmissionTorrentIDs,
   TransmissionTorrentProperties,
+  TransmissionTorrentRenamePathArguments,
   TransmissionTorrentsGetArguments,
   TransmissionTorrentsRemoveArguments,
   TransmissionTorrentsSetArguments,
@@ -295,6 +296,35 @@ class ClientRequestManager {
       .then(({data}) => {
         if (data.result !== 'success') {
           throw new Error();
+        }
+      });
+  }
+
+  async renameTorrentsPath(ids: TransmissionTorrentIDs, path: string, name: string): Promise<void> {
+    const torrentsRenamePathArguments: TransmissionTorrentRenamePathArguments = {
+      ids,
+      path,
+      name,
+    };
+
+    return axios
+      .post<TransmissionRPCResponse>(
+        this.rpcURL,
+        {
+          method: 'torrent-rename-path',
+          arguments: torrentsRenamePathArguments,
+        },
+        {
+          headers: await this.getRequestHeaders(),
+        },
+      )
+      .then(({data}) => {
+        if (data.result !== 'success') {
+          if (typeof data.result === 'string') {
+            throw new Error(data.result);
+          } else {
+            throw new Error();
+          }
         }
       });
   }

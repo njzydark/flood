@@ -6,6 +6,7 @@ const TorrentContextMenuActions = {
   reannounce: 'torrents.list.context.reannounce',
   setTaxonomy: 'torrents.list.context.set.tags',
   move: 'torrents.list.context.move',
+  rename: 'torrents.list.context.rename',
   setTrackers: 'torrents.list.context.set.trackers',
   torrentDetails: 'torrents.list.context.details',
   downloadContents: 'torrents.list.context.download.contents',

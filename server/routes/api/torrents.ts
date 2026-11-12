@@ -21,6 +21,7 @@ import {
   deleteTorrentsSchema,
   moveTorrentsSchema,
   reannounceTorrentsSchema,
+  renameTorrentsSchema,
   setTorrentContentsPropertiesSchema,
   setTorrentsInitialSeedingSchema,
   setTorrentsPrioritySchema,
@@ -657,6 +658,47 @@ const torrentsRoutes = async (fastify: FastifyInstance) => {
           dereference: false,
         }),
       );
+    },
+  );
+
+  typedFastify.post(
+    '/rename',
+    {
+      schema: {
+        summary: 'Rename torrent contents',
+        description: 'Rename the root file or directory of a Transmission torrent.',
+        tags: ['Torrents'],
+        security: [{User: []}],
+        body: renameTorrentsSchema,
+        response: {
+          200: emptyResponseSchema,
+          403: errorResponseSchema,
+          404: errorResponseSchema,
+          500: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const {services} = getRequiredAuthContext(request);
+      const torrent = services.torrentService.getTorrent(request.body.hashes[0]);
+      if (torrent == null) {
+        const {code, message} = fileNotFoundError();
+        return reply.status(404).send({code, message});
+      }
+
+      const directory = sanitizePath(torrent.directory);
+      if (
+        directory !== sanitizePath(request.body.directory) ||
+        torrent.name !== request.body.oldName ||
+        !isAllowedPath(path.join(directory, request.body.oldName)) ||
+        !isAllowedPath(path.join(directory, request.body.newName))
+      ) {
+        const {code, message} = accessDeniedError();
+        return reply.status(403).send({code, message});
+      }
+
+      await services.clientGatewayService.renameTorrents({...request.body, directory});
+      services.torrentService.fetchTorrentList();
     },
   );
 

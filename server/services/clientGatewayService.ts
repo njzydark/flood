@@ -10,6 +10,7 @@ import type {
   CheckTorrentsOptions,
   DeleteTorrentsOptions,
   MoveTorrentsOptions,
+  RenameTorrentsOptions,
   SetTorrentContentsPropertiesOptions,
   SetTorrentsInitialSeedingOptions,
   SetTorrentsPriorityOptions,
@@ -96,6 +97,14 @@ export interface ClientGatewayService extends TypedEmitter<ClientGatewayServiceE
    * @return - Rejects with error.
    */
   moveTorrents(options: MoveTorrentsOptions): Promise<void>;
+
+  /**
+   * Rename torrents destination path.
+   *
+   * @param options - An object of options...
+   * @return - Rejects with error.
+   */
+  renameTorrents(options: RenameTorrentsOptions): Promise<void>;
 
   /**
    * Reannounces torrents to trackers
@@ -231,6 +240,10 @@ export interface ClientGatewayService extends TypedEmitter<ClientGatewayServiceE
 abstract class BaseClientGatewayService extends BaseService<ClientGatewayServiceEvents> {
   errorCount = 0;
   retryTimer?: NodeJS.Timeout | null = null;
+
+  async renameTorrents(_options: RenameTorrentsOptions): Promise<void> {
+    throw new Error('Renaming torrents is not supported by this client.');
+  }
 
   destroyTimer() {
     if (this.retryTimer != null) {

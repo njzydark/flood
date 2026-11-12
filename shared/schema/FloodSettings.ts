@@ -131,6 +131,7 @@ const torrentContextMenuActionsSchema = z.array(torrentContextMenuActionItemSche
   {id: 'reannounce', visible: false},
   {id: 'setTaxonomy', visible: true},
   {id: 'move', visible: true},
+  {id: 'rename', visible: true},
   {id: 'setTrackers', visible: false},
   {id: 'torrentDetails', visible: true},
   {id: 'downloadContents', visible: true},

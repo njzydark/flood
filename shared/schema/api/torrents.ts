@@ -83,6 +83,21 @@ export const moveTorrentsSchema = strictObject({
 
 export type MoveTorrentsOptions = zodInfer<typeof moveTorrentsSchema>;
 
+// POST /api/torrents/rename: Transmission can rename one torrent at a time.
+const torrentNameSchema = string()
+  .min(1)
+  // eslint-disable-next-line no-control-regex
+  .refine((name) => name !== '.' && name !== '..' && !/[\\/\u0000-\u001f\u007f-\u009f]/.test(name));
+
+export const renameTorrentsSchema = strictObject({
+  hashes: array(string().min(1)).length(1),
+  directory: string().min(1),
+  oldName: torrentNameSchema,
+  newName: torrentNameSchema,
+});
+
+export type RenameTorrentsOptions = zodInfer<typeof renameTorrentsSchema>;
+
 const torrentHashesSchema = array(string()).nonempty();
 
 // POST /api/torrents/start

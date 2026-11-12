@@ -476,3 +476,80 @@ describe('POST /api/torrents/move', () => {
     expect(torrent.percentComplete).toBe(100);
   });
 });
+
+describe('POST /api/torrents/rename', () => {
+  it.each(['', '.', '..', '../outside', 'nested/file', 'nested\\file', 'name\u0000'])(
+    'rejects invalid names: %j',
+    async (newName) => {
+      await request
+        .post('/api/torrents/rename')
+        .send({hashes: [createdTorrentHash], directory: tempDirectory, oldName: 'dummy', newName})
+        .set('Cookie', [authToken])
+        .expect(400);
+    },
+  );
+
+  it('rejects multiple torrents', async () => {
+    await request
+      .post('/api/torrents/rename')
+      .send({hashes: [createdTorrentHash, torrentHash], directory: tempDirectory, oldName: 'dummy', newName: 'renamed'})
+      .set('Cookie', [authToken])
+      .expect(400);
+  });
+
+  it('rejects an unknown torrent', async () => {
+    await request
+      .post('/api/torrents/rename')
+      .send({hashes: ['unknown'], directory: tempDirectory, oldName: 'dummy', newName: 'renamed'})
+      .set('Cookie', [authToken])
+      .expect(404);
+  });
+
+  it('rejects a directory that does not belong to the torrent', async () => {
+    await request
+      .post('/api/torrents/rename')
+      .send({hashes: [createdTorrentHash], directory: os.tmpdir(), oldName: 'dummy', newName: 'renamed'})
+      .set('Cookie', [authToken])
+      .expect(403);
+  });
+
+  it.each(['dummy', 'multi'])('renames the root of %s in Transmission', async (name) => {
+    const res = await request.get('/api/torrents').set('Cookie', [authToken]).expect(200);
+    const torrents = Object.values(res.body.torrents as TorrentList).filter((torrent) =>
+      torrent.tags.includes('testCreate'),
+    );
+    expect(torrents).toHaveLength(2);
+
+    const torrent = torrents.find((torrent) => torrent.name === name)!;
+    const newName = `${torrent.name}-renamed`;
+    const isTransmission = config.configUser?.client === 'Transmission';
+    if (isTransmission && name === 'multi') {
+      // Transmission ignores isBasePath in the creation fixture above, so place
+      // the multi-file contents under its actual download directory before renaming.
+      const root = path.join(torrent.directory, torrent.name);
+      fs.mkdirSync(root, {recursive: true});
+      fs.writeFileSync(path.join(root, 'dummy'), 'test');
+      fs.writeFileSync(path.join(root, 'dummy2'), 'test');
+    }
+    if (isTransmission) {
+      expect(fs.existsSync(path.join(torrent.directory, torrent.name))).toBe(true);
+    }
+
+    await request
+      .post('/api/torrents/rename')
+      .send({hashes: [torrent.hash], directory: torrent.directory, oldName: torrent.name, newName})
+      .set('Cookie', [authToken])
+      .expect(isTransmission ? 200 : 500);
+
+    if (isTransmission) {
+      await expect.poll(() => fs.existsSync(path.join(torrent.directory, newName))).toBe(true);
+      expect(fs.existsSync(path.join(torrent.directory, torrent.name))).toBe(false);
+      await expect
+        .poll(async () => {
+          const updated = await request.get('/api/torrents').set('Cookie', [authToken]).expect(200);
+          return (updated.body.torrents as TorrentList)[torrent.hash].name;
+        })
+        .toBe(newName);
+    }
+  });
+});

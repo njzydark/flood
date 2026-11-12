@@ -57,6 +57,8 @@ export interface MoveTorrentsOptions {
   isCheckHash: boolean;
 }
 
+export type {RenameTorrentsOptions} from '../../schema/api/torrents';
+
 // POST /api/torrents/start
 export interface StartTorrentsOptions {
   // An array of string representing hashes of torrents to be started

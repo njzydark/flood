@@ -106,6 +106,14 @@ export const getContextMenuItems = (torrent: TorrentProperties): Array<ContextMe
     },
     {
       type: 'action',
+      action: 'rename',
+      label: TorrentContextMenuActions.rename,
+      clickHandler: () => {
+        UIStore.setActiveModal({id: 'rename-torrents'});
+      },
+    },
+    {
+      type: 'action',
       action: 'setTrackers',
       label: TorrentContextMenuActions.setTrackers,
       clickHandler: () => {
