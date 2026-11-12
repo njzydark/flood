@@ -1,9 +1,10 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {within, expect, waitFor, userEvent} from 'storybook/test';
+import {within, expect, waitFor, userEvent, fireEvent} from 'storybook/test';
 
 import TorrentListRow from './TorrentListRow';
 import {MOCK_TORRENT_STATES} from '@client/storybook-mocks/_fixtures';
 import TorrentStore from '@client/stores/TorrentStore';
+import UIStore from '@client/stores/UIStore';
 import FloodActions from '@client/actions/FloodActions';
 import MockStateStore from '@client/storybook-mocks/MockStateStore';
 import type {TorrentProperties} from '@shared/types/Torrent';
@@ -40,6 +41,30 @@ const meta: Meta<typeof TorrentListRow> = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// Desktop WebKit exposes Touch but does not allow constructing it.
+const fireTouch = (row: HTMLElement, type: string, touches: Array<{clientX: number; clientY: number}> = []) =>
+  fireEvent(row, Object.assign(new Event(type, {bubbles: true, cancelable: true}), {touches}));
+const startTouch = (row: HTMLElement, x = 50, y = 50) => fireTouch(row, 'touchstart', [{clientX: x, clientY: y}]);
+const endTouch = (row: HTMLElement) => fireTouch(row, 'touchend');
+const tap = (row: HTMLElement) => {
+  startTouch(row);
+  endTouch(row);
+};
+
+const touchDoubleTap: NonNullable<Story['play']> = async ({canvasElement}) => {
+  const hash = MOCK_TORRENT_STATES.downloading.hash;
+  const row = await within(canvasElement).findByTestId(`torrent-${hash}`);
+  UIStore.setActiveModal(null);
+  tap(row);
+  expect(TorrentStore.selectedTorrents).toContain(hash);
+  expect(UIStore.activeModal).toBeNull();
+  // A normal double tap can exceed the old 200ms window.
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  tap(row);
+  expect(UIStore.activeModal).toMatchObject({id: 'torrent-details', hash});
+  UIStore.setActiveModal(null);
+};
 
 /**
  * Helper to setup torrent data before rendering
@@ -92,6 +117,59 @@ const setupTorrent = (
 });
 
 // ====== EXPANDED VIEW STORIES ======
+
+export const ExpandedTouchDoubleTap: Story = {
+  ...setupTorrent(MOCK_TORRENT_STATES.downloading, 'expanded'),
+  tags: ['touch-regression'],
+  play: touchDoubleTap,
+};
+
+export const CondensedTouchDoubleTap: Story = {
+  ...setupTorrent(MOCK_TORRENT_STATES.downloading, 'condensed'),
+  tags: ['touch-regression'],
+  play: touchDoubleTap,
+};
+
+export const TouchScrollAndCancel: Story = {
+  ...setupTorrent(MOCK_TORRENT_STATES.downloading, 'expanded'),
+  tags: ['touch-regression'],
+  play: async ({canvasElement}) => {
+    const row = await within(canvasElement).findByTestId(`torrent-${MOCK_TORRENT_STATES.downloading.hash}`);
+    UIStore.setActiveModal(null);
+    UIStore.setActiveContextMenu(null);
+    tap(row);
+    startTouch(row);
+    fireTouch(row, 'touchmove', [{clientX: 50, clientY: 90}]);
+    endTouch(row);
+    tap(row);
+    expect(UIStore.activeModal).toBeNull();
+    startTouch(row);
+    fireTouch(row, 'touchcancel');
+    endTouch(row);
+    tap(row);
+    expect(UIStore.activeModal).toBeNull();
+    await new Promise((resolve) => setTimeout(resolve, 550));
+    expect(UIStore.activeContextMenu).toBeNull();
+  },
+};
+
+export const TouchLongPress: Story = {
+  ...setupTorrent(MOCK_TORRENT_STATES.downloading, 'expanded'),
+  tags: ['touch-regression'],
+  play: async ({canvasElement}) => {
+    const row = await within(canvasElement).findByTestId(`torrent-${MOCK_TORRENT_STATES.downloading.hash}`);
+    UIStore.setActiveModal(null);
+    UIStore.setActiveContextMenu(null);
+    startTouch(row);
+    await waitFor(() => expect(UIStore.activeContextMenu?.id).toBe('torrent-list-item'));
+    endTouch(row);
+    expect(UIStore.activeModal).toBeNull();
+    expect(UIStore.activeContextMenu?.id).toBe('torrent-list-item');
+    UIStore.setActiveContextMenu(null);
+    tap(row);
+    expect(UIStore.activeModal).toBeNull();
+  },
+};
 
 export const ExpandedDownloading: Story = {
   ...setupTorrent(MOCK_TORRENT_STATES.downloading, 'expanded'),

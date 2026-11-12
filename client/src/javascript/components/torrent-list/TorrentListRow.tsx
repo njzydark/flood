@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import {computed} from 'mobx';
-import {CSSProperties, FC, KeyboardEvent, MouseEvent, TouchEvent, useRef, useState} from 'react';
+import {CSSProperties, FC, KeyboardEvent, MouseEvent, TouchEvent, useEffect, useRef} from 'react';
 import {observer} from 'mobx-react-lite';
 import {useLongPress} from 'react-use';
 
@@ -74,8 +74,8 @@ interface TorrentListRowProps {
 }
 
 const TorrentListRow: FC<TorrentListRowProps> = observer(({hash, style}: TorrentListRowProps) => {
-  const [rowLocation, setRowLocation] = useState<number>(0);
-  const shouldDisplayTorrentDetails = useRef<boolean>(false);
+  const touchStart = useRef<{x: number; y: number; hash: string; longPressed: boolean} | null>(null);
+  const lastTap = useRef<{x: number; y: number; time: number; hash: string} | null>(null);
   const rowRef = useRef<HTMLDivElement>(null);
 
   const isCondensed = SettingStore.floodSettings.torrentListViewSize === 'condensed';
@@ -93,30 +93,75 @@ const TorrentListRow: FC<TorrentListRowProps> = observer(({hash, style}: Torrent
     'torrent',
   );
 
-  const {onTouchStart, onTouchEnd} = useLongPress((e) => {
-    const curRowLocation = rowRef.current?.getBoundingClientRect().top;
-    if (e != null && curRowLocation != null && Math.abs(curRowLocation - rowLocation) < 25) {
-      displayContextMenu(hash, e as unknown as TouchEvent);
-    }
-  });
+  const {onTouchStart, onTouchEnd} = useLongPress(
+    (e) => {
+      if (e != null && touchStart.current?.hash === hash) {
+        touchStart.current.longPressed = true;
+        lastTap.current = null;
+        displayContextMenu(hash, e as unknown as TouchEvent);
+      }
+    },
+    {delay: 500, isPreventDefault: false},
+  );
+
+  const cancelTouch = () => {
+    onTouchEnd();
+    touchStart.current = null;
+    lastTap.current = null;
+  };
+
+  useEffect(() => {
+    touchStart.current = null;
+    lastTap.current = null;
+    return onTouchEnd;
+  }, [hash, onTouchEnd]);
 
   const onTouchStartHooked = (e: TouchEvent) => {
-    if (!TorrentStore.selectedTorrents.includes(hash)) {
-      selectTorrent(hash, e);
+    if (e.touches.length !== 1) {
+      cancelTouch();
+      return;
     }
 
-    if (shouldDisplayTorrentDetails.current) {
+    const {clientX: x, clientY: y} = e.touches[0];
+    touchStart.current = {x, y, hash, longPressed: false};
+    onTouchStart(e);
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    const start = touchStart.current;
+    const touch = e.touches[0];
+    if (start && (e.touches.length !== 1 || Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 10)) {
+      cancelTouch();
+    }
+  };
+
+  const onTouchEndHooked = (e: TouchEvent) => {
+    onTouchEnd();
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start || start.hash !== hash) {
+      return;
+    }
+    // Handle taps ourselves instead of relying on Safari's synthesized mouse events.
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+    if (start.longPressed) {
+      return;
+    }
+    selectTorrent(hash, e);
+    const previous = lastTap.current;
+    const time = e.timeStamp;
+    if (
+      previous?.hash === hash &&
+      time - previous.time <= 400 &&
+      Math.hypot(start.x - previous.x, start.y - previous.y) <= 25
+    ) {
+      lastTap.current = null;
       displayTorrentDetails(hash);
     } else {
-      shouldDisplayTorrentDetails.current = true;
-      setTimeout(() => {
-        shouldDisplayTorrentDetails.current = false;
-      }, 200);
+      lastTap.current = {x: start.x, y: start.y, time, hash};
     }
-
-    setRowLocation(rowRef.current?.getBoundingClientRect().top || 0);
-
-    onTouchStart(e);
   };
 
   const torrent = TorrentStore.torrents?.[hash];
@@ -134,7 +179,9 @@ const TorrentListRow: FC<TorrentListRowProps> = observer(({hash, style}: Torrent
         handleDoubleClick={displayTorrentDetails}
         handleRightClick={displayContextMenu}
         handleTouchStart={onTouchStartHooked}
-        handleTouchEnd={onTouchEnd}
+        handleTouchEnd={onTouchEndHooked}
+        handleTouchMove={onTouchMove}
+        handleTouchCancel={cancelTouch}
         handleKeyDown={(e) => onKeyDown(hash, e)}
         data-testid={torrentTestId}
         data-torrent-status={torrentStatus}
@@ -155,7 +202,9 @@ const TorrentListRow: FC<TorrentListRowProps> = observer(({hash, style}: Torrent
       handleDoubleClick={displayTorrentDetails}
       handleRightClick={displayContextMenu}
       handleTouchStart={onTouchStartHooked}
-      handleTouchEnd={onTouchEnd}
+      handleTouchEnd={onTouchEndHooked}
+      handleTouchMove={onTouchMove}
+      handleTouchCancel={cancelTouch}
       handleKeyDown={(e) => onKeyDown(hash, e)}
       data-testid={torrentTestId}
       data-torrent-status={torrentStatus}
