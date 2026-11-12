@@ -32,25 +32,29 @@ const Sidebar: FC = () => (
       },
     }}
   >
-    <div style={{display: 'flex', flexDirection: 'column'}}>
-      <SidebarActions>
-        <SpeedLimitDropdown />
-        <SettingsButton />
-        <FeedsButton />
-        <NotificationsButton />
-        <LogoutButton />
-      </SidebarActions>
-      <TransferData />
-      <SearchBox />
-      <StatusFilters />
-      <TagFilters />
-      <TrackerFilters />
-      <LocationFilters />
-      <DiskUsage />
-      <div style={{flexGrow: 1}} />
-      <SidebarActions>
-        <ThemeSwitchButton />
-      </SidebarActions>
+    <div style={{display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden'}}>
+      <div style={{flexShrink: 0}}>
+        <SidebarActions>
+          <SpeedLimitDropdown />
+          <SettingsButton />
+          <FeedsButton />
+          <NotificationsButton />
+          <LogoutButton />
+        </SidebarActions>
+        <TransferData />
+        <SearchBox />
+      </div>
+      <div style={{flex: 1, overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <StatusFilters />
+        <TagFilters />
+        <TrackerFilters />
+        <LocationFilters />
+        <DiskUsage />
+        <div style={{flexGrow: 1}} />
+        <SidebarActions>
+          <ThemeSwitchButton />
+        </SidebarActions>
+      </div>
     </div>
   </OverlayScrollbarsComponent>
 );
