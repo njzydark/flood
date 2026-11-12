@@ -9,9 +9,7 @@ const BrowserTheme: FC<{isDark: boolean}> = ({isDark}) => {
       ?.setAttribute('content', getComputedStyle(document.documentElement).backgroundColor);
   }, [isDark]);
 
-  // WebKit keeps the first edge color of a full-viewport fixed box. A new,
-  // transparent edge container makes it sample the current pixels on theme changes.
-  return <div key={String(isDark)} className="application__theme-color" aria-hidden="true" />;
+  return <div className="application__theme-color" aria-hidden="true" />;
 };
 
 export default BrowserTheme;
